@@ -38,7 +38,7 @@ Thumbs.db
 .scratchpad/
 logs/
 output/
-*.txt
+
 
 # Memory data
 data/

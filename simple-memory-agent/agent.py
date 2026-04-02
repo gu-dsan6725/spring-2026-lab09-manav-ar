@@ -15,6 +15,7 @@ import asyncio
 import json
 import logging
 import os
+import uuid
 from typing import (
     Any,
     Dict,
@@ -423,7 +424,6 @@ class Agent:
             os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
 
         # Session management: auto-generate unique session ID if not provided
-        import uuid
         self.user_id = user_id
         self.model = model
         self.agent_id = agent_id or "memory-agent"
@@ -682,8 +682,10 @@ def _run_demo() -> None:
     print("      automatically handled by retry logic. The agent works correctly.")
     print()
 
-    # Create agent
-    agent = Agent(user_id="demo_user")
+    # Create agent with a fresh user_id to avoid any cached/corrupted state
+    demo_user_id = f"demo_{uuid.uuid4().hex[:8]}"
+    print(f"Using user_id: {demo_user_id}")
+    agent = Agent(user_id=demo_user_id)
 
     print("Agent initialized! Features:")
     print("  - Automatic background storage of all conversations")

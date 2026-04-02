@@ -38,7 +38,7 @@ Thumbs.db
 # Project specific
 logs/
 output/
-*.log
+
 
 # AWS
 .aws/

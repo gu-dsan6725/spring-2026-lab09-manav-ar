@@ -1,0 +1,67 @@
+=== Alice Session 1 ===
+
+User: Hi, I'm Alice. I'm a software engineer.
+Agent: Hi Alice! It's great to meet you! 👋 I'm glad to know you're a software engineer. This is our first interaction, so I'm starting fresh with you.
+
+I have access to long-term memory, so as we chat, I'll be able to remember important details about you, your projects, preferences, and interests across our conversations. This way, if you come back and ask me something later, I'll have the context of what we've discussed before.
+
+Is there something specific I can help you with today? Whether it's coding questions, project advice, debugging help, or anything else related to software engineering—or just general conversation—I'm here to help!
+
+User: I prefer Python for development.
+Agent: Got it! I've noted that you prefer Python for development. 🐍 Python is a great choice—it's versatile, readable, and has a fantastic ecosystem for everything from web development and data science to automation and machine learning.
+
+Is there anything specific about Python you'd like to discuss? Whether it's best practices, particular libraries or frameworks you work with, debugging a tricky problem, or exploring new tools and techniques—I'm happy to help!
+
+User: What programming languages do I like?
+Agent: Based on what you've told me, you prefer **Python** for development. 
+
+That's the only language preference you've mentioned so far. Do you work with other languages as well, or is Python your primary focus?
+
+User: I'm working on a FastAPI project.
+Agent: Nice! FastAPI is an excellent choice for building modern APIs with Python. It's known for being fast, intuitive, and having great built-in features like automatic API documentation, data validation with Pydantic, and async support.
+
+How's the project coming along? Are you:
+- Just getting started and setting up the initial structure?
+- Building out specific endpoints or features?
+- Running into any challenges or looking for optimization advice?
+- Wondering about best practices or architecture?
+
+I'd be happy to help with any questions or issues you're encountering! 🚀
+
+User: What have we discussed so far?
+Agent: Here's what we've discussed so far:
+
+1. **About you**: You're a software engineer named Alice
+2. **Your programming preference**: You prefer Python for development
+3. **Your current project**: You're working on a FastAPI project
+
+That's the context we've established so far in our conversation. I've stored these details in my memory, so I'll remember them for future conversations too.
+
+Is there anything else you'd like to tell me about yourself or your FastAPI project?
+
+
+=== Alice Session 2 (New Session) ===
+
+User: What do you remember about me?
+Agent: Based on my memory, here's what I know about you:
+
+**About You:**
+- Your name is **Alice**
+- You're a **software engineer**
+
+**Your Technical Preferences & Work:**
+- You prefer **Python** for development
+- You're currently working on a **FastAPI project**
+
+Is there anything else about yourself you'd like me to know or remember? Feel free to share more about your work, interests, or preferences, and I can keep track of that information for our future conversations!
+
+User: What project am I working on?
+Agent: Based on my memory, you're currently working on a **FastAPI project**.
+
+Would you like to tell me more details about this project? For example:
+- What are you building with FastAPI?
+- What stage is the project at?
+- Are you facing any challenges or looking for help with it?
+
+I can keep track of more specific details about your project for future reference!
+

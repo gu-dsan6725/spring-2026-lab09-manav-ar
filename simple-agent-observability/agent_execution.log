@@ -1,0 +1,161 @@
+2026-04-01 22:27:58,916,p266090,{agent.py:177},INFO,Starting Simple Agent with Observability
+2026-04-01 22:27:58,916,p266090,{agent.py:115},INFO,Creating Strands agent
+2026-04-01 22:27:58,916,p266090,{agent.py:84},INFO,Setting up Braintrust observability
+2026-04-01 22:27:58,917,p266090,{agent.py:104},INFO,Braintrust observability configured for project: project_name:lab9
+2026-04-01 22:27:59,469,p266090,{agent.py:149},INFO,Agent created successfully with Braintrust observability
+
+================================================================================
+Simple Agent with Observability Demo
+================================================================================
+
+Ask me anything! I can search the web with DuckDuckGo.
+Type 'quit' to exit.
+
+You: what is the latest geo political news?
+2026-04-01 22:28:24,382,p266090,{agent.py:167},INFO,Processing user input: what is the latest geo political news?
+2026-04-01 22:28:24,383,p266090,{metrics.py:557},INFO,Creating Strands MetricsClient
+2026-04-01 22:28:24,779,p266090,{_client.py:1740},INFO,HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+
+Tool #1: duckduckgo_search
+2026-04-01 22:28:25,324,p266090,{agent.py:64},INFO,Searching DuckDuckGo for: latest geopolitical news
+2026-04-01 22:28:26,422,p266090,{lib.rs:404},INFO,response: https://grokipedia.com/api/typeahead?query=latest+geopolitical+news&limit=1 200
+2026-04-01 22:28:26,455,p266090,{lib.rs:404},INFO,response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=latest%20geopolitical%20news 200
+2026-04-01 22:28:26,818,p266090,{lib.rs:404},INFO,response: https://search.brave.com/search?q=latest+geopolitical+news&source=web 200
+2026-04-01 22:28:26,863,p266090,{agent.py:69},INFO,Found 5 results
+2026-04-01 22:28:28,078,p266090,{_client.py:1740},INFO,HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+Based on the search results, here is a summary of the latest geopolitical news:
+
+- The ongoing US-Iran tensions and the potential for further escalation in the region is a major geopolitical issue. There are concerns about how this conflict could impact global stability.
+
+- Europe's evolving relationship with the United States is a pressing geopolitical concern, as the two powers navigate complex international dynamics.
+
+- Developments in global energy markets, including the energy crisis in Europe, have significant geopolitical implications that are being closely monitored.
+
+- There are ongoing tensions and conflicts in various regions of the world, such as the situation between Turkmenistan and Afghanistan, that are shaping the geopolitical landscape.
+
+- Geopolitical analysis and risk assessment are crucial for understanding the complex web of international relations, conflicts, and diplomatic maneuverings that are shaping the global order.
+
+The search results highlight the importance of closely following geopolitical news and analysis from rep/mnt/c/Users/manav/OneDrive/Documents/MS-DSAN/6725/spring-2026-lab09-manav-ar/.venv/lib/python3.12/site-packages/pydantic/main.py:464: UserWarning: Pydantic serializer warnings:
+  PydanticSerializationUnexpectedValue(Expected `ParsedTextBlock[TypeVar]` - serialized value may not be as expected [field_name='content', input_value=ParsedTextBlock(citations...xt', parsed_output=None), input_type=ParsedTextBlock])
+  PydanticSerializationUnexpectedValue(Expected `ThinkingBlock` - serialized value may not be as expected [field_name='content', input_value=ParsedTextBlock(citations...xt', parsed_output=None), input_type=ParsedTextBlock])
+  PydanticSerializationUnexpectedValue(Expected `RedactedThinkingBlock` - serialized value may not be as expected [field_name='content', input_value=ParsedTextBlock(citations...xt', parsed_output=None), input_type=ParsedTextBlock])
+  PydanticSerializationUnexpectedValue(Expected `ToolUseBlock` - serialized value may not be as expected [field_name='content', input_value=ParsedTextBlock(citations...xt', parsed_output=None), input_type=ParsedTextBlock])
+  PydanticSerializationUnexpectedValue(Expected `ServerToolUseBlock` - serialized value may not be as expected [field_name='content', input_value=ParsedTextBlock(citations...xt', parsed_output=None), input_type=ParsedTextBlock])
+  PydanticSerializationUnexpectedValue(Expected `WebSearchToolResultBlock` - serialized value may not be as expected [field_name='content', input_value=ParsedTextBlock(citations...xt', parsed_output=None), input_type=ParsedTextBlock])
+  return self.__pydantic_serializer__.to_python(
+2026-04-01 22:28:30,103,p266090,{agent.py:171},INFO,Agent response generated
+utable sources like Geopolitical Monitor, The Economist, and Stratfor to stay informed on the latest developments. Maintaining situational awareness of geopolitical dynamics is crucial for understanding the broader context of world events.
+Agent: Based on the search results, here is a summary of the latest geopolitical news:
+
+- The ongoing US-Iran tensions and the potential for further escalation in the region is a major geopolitical issue. There are concerns about how this conflict could impact global stability.
+
+- Europe's evolving relationship with the United States is a pressing geopolitical concern, as the two powers navigate complex international dynamics.
+
+- Developments in global energy markets, including the energy crisis in Europe, have significant geopolitical implications that are being closely monitored.
+
+- There are ongoing tensions and conflicts in various regions of the world, such as the situation between Turkmenistan and Afghanistan, that are shaping the geopolitical landscape.
+
+- Geopolitical analysis and risk assessment are crucial for understanding the complex web of international relations, conflicts, and diplomatic maneuverings that are shaping the global order.
+
+The search results highlight the importance of closely following geopolitical news and analysis from reputable sources like Geopolitical Monitor, The Economist, and Stratfor to stay informed on the latest developments. Maintaining situational awareness of geopolitical dynamics is crucial for understanding the broader context of world events.
+
+
+You: who won the fields medal most recently?
+2026-04-01 22:28:43,271,p266090,{agent.py:167},INFO,Processing user input: who won the fields medal most recently?
+2026-04-01 22:28:43,277,p266090,{_base_client.py:1801},INFO,Retrying request to /v1/messages in 0.399388 seconds
+2026-04-01 22:28:44,040,p266090,{_client.py:1740},INFO,HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+
+Tool #2: duckduckgo_search
+2026-04-01 22:28:44,546,p266090,{agent.py:64},INFO,Searching DuckDuckGo for: who won the fields medal most recently
+2026-04-01 22:28:44,692,p266090,{lib.rs:404},INFO,response: https://grokipedia.com/api/typeahead?query=who+won+the+fields+medal+most+recently&limit=1 200
+2026-04-01 22:28:44,704,p266090,{lib.rs:404},INFO,response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=who%20won%20the%20fields%20medal%20most%20recently 200
+2026-04-01 22:28:44,859,p266090,{lib.rs:404},INFO,response: https://search.yahoo.com/search;_ylt=xMaPeZR-ZxLa_0JKLH-SAB6b;_ylu=K_QxDdDPhc5yRNm5SriWCJiksRnWloV9uFM7h7MEN9Je4DM?p=who+won+the+fields+medal+most+recently 200
+2026-04-01 22:28:45,418,p266090,{agent.py:69},INFO,Found 5 results
+2026-04-01 22:28:46,043,p266090,{_client.py:1740},INFO,HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+According to the information gathered from the search results, the most recent Fields Medal winners were announced on July 5, 2022 in an online event that was originally planned to be held in Saint Petersburg, Russia, but was moved to Helsinki, Finland following the 2022 Russian invasion of Ukraine.
+
+The 2022 Fields Medal recipients were:
+
+- Hugo Duminil-Copin (France)
+- June Huh (South Korea)
+- James Maynard (United Kingdom) 
+- Maryna Viazovska (Ukraine)
+
+So the2026-04-01 22:28:47,543,p266090,{agent.py:171},INFO,Agent response generated
+ most recent Fields Medal winners were announced in 2022, with four mathematicians under the age of 40 being awarded the prestigious prize for their groundbreaking contributions to the field of mathematics.
+Agent: According to the information gathered from the search results, the most recent Fields Medal winners were announced on July 5, 2022 in an online event that was originally planned to be held in Saint Petersburg, Russia, but was moved to Helsinki, Finland following the 2022 Russian invasion of Ukraine.
+
+The 2022 Fields Medal recipients were:
+
+- Hugo Duminil-Copin (France)
+- June Huh (South Korea)
+- James Maynard (United Kingdom) 
+- Maryna Viazovska (Ukraine)
+
+So the most recent Fields Medal winners were announced in 2022, with four mathematicians under the age of 40 being awarded the prestigious prize for their groundbreaking contributions to the field of mathematics.
+
+
+You: what are the current trends in crytocurrency?
+2026-04-01 22:29:03,693,p266090,{agent.py:167},INFO,Processing user input: what are the current trends in crytocurrency?
+2026-04-01 22:29:03,703,p266090,{_base_client.py:1801},INFO,Retrying request to /v1/messages in 0.495388 seconds
+2026-04-01 22:29:04,940,p266090,{_client.py:1740},INFO,HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+
+Tool #3: duckduckgo_search
+2026-04-01 22:29:05,456,p266090,{agent.py:64},INFO,Searching DuckDuckGo for: current trends in cryptocurrency
+2026-04-01 22:29:05,600,p266090,{lib.rs:404},INFO,response: https://grokipedia.com/api/typeahead?query=current+trends+in+cryptocurrency&limit=1 200
+2026-04-01 22:29:05,601,p266090,{lib.rs:404},INFO,response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=current%20trends%20in%20cryptocurrency 200
+2026-04-01 22:29:06,185,p266090,{lib.rs:404},INFO,response: https://search.brave.com/search?q=current+trends+in+cryptocurrency&source=web 200
+2026-04-01 22:29:06,210,p266090,{agent.py:69},INFO,Found 5 results
+2026-04-01 22:29:07,049,p266090,{_client.py:1740},INFO,HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+Based on the search results, here are some of the key current trends in the cryptocurrency market:
+
+1. Volatility and price fluctuations:
+   - The cryptocurrency market remains highly volatile, with Bitcoin and other major cryptocurrencies experiencing significant price swings on a daily basis.
+   - Factors like regulatory changes, institutional adoption, and market sentiment continue to drive these price fluctuations.
+
+2. Continued growth in market capitalization:
+   - The global cryptocurrency market capitalization remains above $2 trillion, although it has seen some recent declines.
+   - Ethereum, the second-largest cryptocurrency after Bitcoin, has a market cap of over $250 billion.
+
+3. Increased institutional adoption:
+   - More traditional financial institutions and large corporations are getting involved in the crypto space, investing in and exploring the use of cryptocurrencies and blockchain technology.
+   - This institutional interest is seen as a sign of the maturing of the cryptocurrency market.
+
+4. Emergence of new crypto trends and technologies:
+   - Decentralized finance (DeFi) applications and non-fungible tokens (NFTs) have gained significant traction in the crypto ecosystem.
+   - Developments in layer-2 scaling solutions and the growing popularity of alternative blockchains are also shaping the current crypto landscape.
+
+5. Regulatory scrutiny and uncertainty:
+   - Governments and regulatory bodies around the world continue to grapple with how to best approach the regulation of cryptocurrencies and the broader crypto industry.
+   - This regulatory uncertainty can contribute to market volatility and impact the long-term growth and adoption of cryptocurrencies.
+
+It's important to note that the2026-04-01 22:29:09,791,p266090,{agent.py:171},INFO,Agent response generated
+ cryptocurrency market is constantly evolving, and these trends are subject to change. Investors and interested parties should stay informed by regularly monitoring reputable cryptocurrency news and analysis sources.
+Agent: Based on the search results, here are some of the key current trends in the cryptocurrency market:
+
+1. Volatility and price fluctuations:
+   - The cryptocurrency market remains highly volatile, with Bitcoin and other major cryptocurrencies experiencing significant price swings on a daily basis.
+   - Factors like regulatory changes, institutional adoption, and market sentiment continue to drive these price fluctuations.
+
+2. Continued growth in market capitalization:
+   - The global cryptocurrency market capitalization remains above $2 trillion, although it has seen some recent declines.
+   - Ethereum, the second-largest cryptocurrency after Bitcoin, has a market cap of over $250 billion.
+
+3. Increased institutional adoption:
+   - More traditional financial institutions and large corporations are getting involved in the crypto space, investing in and exploring the use of cryptocurrencies and blockchain technology.
+   - This institutional interest is seen as a sign of the maturing of the cryptocurrency market.
+
+4. Emergence of new crypto trends and technologies:
+   - Decentralized finance (DeFi) applications and non-fungible tokens (NFTs) have gained significant traction in the crypto ecosystem.
+   - Developments in layer-2 scaling solutions and the growing popularity of alternative blockchains are also shaping the current crypto landscape.
+
+5. Regulatory scrutiny and uncertainty:
+   - Governments and regulatory bodies around the world continue to grapple with how to best approach the regulation of cryptocurrencies and the broader crypto industry.
+   - This regulatory uncertainty can contribute to market volatility and impact the long-term growth and adoption of cryptocurrencies.
+
+It's important to note that the cryptocurrency market is constantly evolving, and these trends are subject to change. Investors and interested parties should stay informed by regularly monitoring reputable cryptocurrency news and analysis sources.
+
+
+You: exit
+
+Goodbye!

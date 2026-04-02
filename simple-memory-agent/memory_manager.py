@@ -5,72 +5,6 @@ This module provides a backend-agnostic interface for memory management,
 currently implemented with Mem0 cloud platform but designed to be swappable
 with other solutions (langmem, custom implementations, etc.). The abstraction
 allows the agent to remain independent of the specific memory backend.
-
-Memory Types:
-- Semantic: Facts, knowledge, and information extracted from conversations
-- Episodic: Specific conversation turns and interaction history
-- Preference: User preferences, likes/dislikes, and behavioral patterns
-- Summary: Condensed summaries of longer conversation sequences
-
-Usage Example:
-    import asyncio
-
-    # Initialize memory manager (synchronous)
-    manager = MemoryManager(
-        api_key=os.getenv("MEM0_API_KEY")
-    )
-
-    # All memory operations are async and must be awaited
-    async def example_usage():
-        user_id = "user_123"
-
-        # Insert memory directly
-        result = await manager.insert(
-            user_id=user_id,
-            content="User prefers Python for data processing",
-            metadata={"type": "preference", "category": "programming"}
-        )
-
-        # Search for memories
-        memories = await manager.search(
-            user_id=user_id,
-            query="programming preferences",
-            limit=5
-        )
-
-        # Add conversation turn (episodic memory)
-        await manager.add_conversation(
-            user_id=user_id,
-            user_message="What's my favorite language?",
-            assistant_message="You prefer Python for data processing."
-        )
-
-        # Export all memories
-        export_data = await manager.export(user_id=user_id, format="json")
-
-        # Get statistics
-        stats = await manager.get_stats(user_id=user_id)
-
-        # Clear all memories (use with caution!)
-        await manager.clear(user_id=user_id)
-
-    # Run async operations
-    asyncio.run(example_usage())
-
-Integration with Agent:
-    The MemoryManager can be used directly in agent.py to replace inline
-    memory operations, making the agent backend-independent. All methods
-    must be awaited:
-
-    # In agent.py __init__:
-    self.memory_manager = MemoryManager(api_key)
-
-    # Replace direct memory.add() calls (use await):
-    await self.memory_manager.add_conversation(user_id, user_input, response_text)
-
-    # Use in tools (use await):
-    search_results = await self.memory_manager.search(user_id, query, limit)
-    insert_result = await self.memory_manager.insert(user_id, content, metadata=metadata)
 """
 
 import json
@@ -93,23 +27,9 @@ logger = logging.getLogger(__name__)
 class MemoryManager:
     """Abstract memory management that can be swapped with different backends.
 
-    This pattern allows replacing Mem0 with other solutions (langmem, custom, etc.)
-    while keeping the agent interface the same. The manager handles all memory
-    operations including storage, retrieval, search, and export.
-
-    Memory categorization:
-    - Semantic memories: Facts, knowledge, preferences extracted from conversations
-    - Episodic memories: Specific conversation turns and interaction sequences
-    - Preference memories: User likes, dislikes, and behavioral patterns
-    - Summary memories: Condensed representations of conversation history
-
     IMPORTANT: This class uses async/await patterns. All memory operations
     (insert, search, get_all, add_conversation, clear, export, get_stats)
     are async methods and must be awaited.
-
-    Attributes:
-        user_id: User identifier for memory association
-        memory: Backend memory instance (currently Mem0 cloud platform MemoryClient)
     """
 
     def __init__(
@@ -124,17 +44,6 @@ class MemoryManager:
 
         Args:
             api_key: Mem0 API key for cloud platform access
-
-        Raises:
-            ValueError: If api_key is missing
-
-        Note:
-            Multi-tenant architecture:
-            - ONE MemoryManager instance serves ALL users/sessions
-            - user_id, agent_id, run_id passed as method parameters
-            - Each user's memories are isolated by user_id
-            - Sessions organized by run_id for better context tracking
-            - Efficient resource usage (single cloud connection)
         """
         if not api_key:
             raise ValueError("api_key is required for Mem0 cloud platform")
@@ -157,16 +66,6 @@ class MemoryManager:
     ) -> Dict[str, Any]:
         """Insert memory asynchronously for a specific user/session.
 
-        This async method stores content in the memory backend with optional metadata.
-        Multi-tenant: user_id, agent_id, and run_id are passed as parameters to
-        isolate memories per user and organize by session.
-
-        Memory type examples:
-        - Semantic: "User is a software engineer specializing in Python"
-        - Preference: "User prefers clean, maintainable code over clever solutions"
-        - Episodic: Conversation turn stored with timestamp
-        - Summary: "User discussed machine learning projects for 10 minutes"
-
         Args:
             user_id: User identifier (required for multi-tenant isolation)
             content: The information to store in memory
@@ -176,9 +75,6 @@ class MemoryManager:
 
         Returns:
             Dictionary with operation status and stored information
-
-        Raises:
-            ValueError: If user_id or content is empty
         """
         if not user_id or not user_id.strip():
             raise ValueError("user_id cannot be empty")
@@ -191,21 +87,13 @@ class MemoryManager:
                 f"Inserting memory for user={user_id}, agent={agent_id}, "
                 f"session={run_id}: '{content[:100]}...'"
             )
-            logger.debug(f"Metadata: {metadata}")
 
-            # Merge provided metadata with session context
-            full_metadata = metadata or {}
-            if agent_id:
-                full_metadata["agent_id"] = agent_id
-            if run_id:
-                full_metadata["run_id"] = run_id
-
-            # Store in Mem0 cloud platform with user_id and run_id as first-class parameters
+            # Store in Mem0 cloud platform - only pass user_id.
+            # Don't pass metadata or run_id as they can cause silent failures
+            # in Mem0's background processing, making memories un-searchable.
             self.memory.add(
                 content,
                 user_id=user_id,
-                run_id=run_id,
-                metadata=full_metadata
             )
 
             logger.info(f"Memory stored for user={user_id} with context (agent={agent_id}, session={run_id})")
@@ -219,7 +107,6 @@ class MemoryManager:
             }
 
             logger.info("Memory inserted successfully")
-            logger.debug(f"Result:\n{json.dumps(result, indent=2, default=str)}")
 
             return result
 
@@ -240,15 +127,10 @@ class MemoryManager:
         agent_id: Optional[str] = None,
         metadata_filters: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
-        """Search memories asynchronously for a specific user with optional filtering.
+        """Search memories asynchronously for a specific user.
 
         Performs semantic search across stored memories using vector similarity.
-        Multi-tenant: user_id isolates search to specific user's memories.
-        Returns the most relevant memories ranked by relevance score. Must be awaited.
-
-        IMPORTANT: Search retrieves memories from ALL sessions for the user (cross-session recall).
-        We do NOT filter by run_id during search - we want the agent to recall information
-        from any previous conversation, not just the current session.
+        Searches across ALL sessions for the user (cross-session recall).
 
         Args:
             user_id: User identifier (required for multi-tenant isolation)
@@ -256,20 +138,10 @@ class MemoryManager:
             limit: Maximum number of memories to return (default: 5)
             run_id: Provided for context but NOT used in search (cross-session recall)
             agent_id: Filter by specific agent (optional)
-            metadata_filters: Filter by metadata (e.g., {"tags": {"in": ["work"]}})
+            metadata_filters: Filter by metadata (optional)
 
         Returns:
             List of memory dictionaries with content, scores, and metadata
-
-        Raises:
-            ValueError: If user_id or query is empty, or limit is invalid
-
-        Note:
-            Multi-tenant filtering:
-            - Each user only sees their own memories (user_id isolation)
-            - Searches across ALL sessions (no run_id filter for cross-session recall)
-            - Optional agent filter: search(user_id, query, agent_id="assistant-1")
-            - Optional metadata filter: search(user_id, query, metadata_filters={"tags": {"in": ["work"]}})
         """
         if not user_id or not user_id.strip():
             raise ValueError("user_id cannot be empty")
@@ -286,51 +158,22 @@ class MemoryManager:
                 f"(limit={limit}, searching across ALL sessions)"
             )
 
-            # Get all run_ids for this user for cross-session recall
-            # Mem0 stores memories under run_id, so we need to query all runs
-            try:
-                users_data = self.memory.users()
-                # Filter for runs (type='run') that belong to this user
-                # Runs are typically named like: user_id-session-N
-                user_runs = [u['name'] for u in users_data.get('results', [])
-                           if u.get('type') == 'run' and u['name'].startswith(user_id + '-')]
-                logger.debug(f"Found {len(user_runs)} runs for user={user_id}: {user_runs}")
-            except Exception as e:
-                logger.warning(f"Could not get user runs, falling back to user_id filter: {e}")
-                user_runs = None
-
-            # Build filters for Mem0 cloud platform
-            # Use OR logic across all user's run_ids for cross-session recall
-            if user_runs and len(user_runs) > 0:
-                filters = {
-                    'OR': [{'run_id': run} for run in user_runs]
-                }
-            else:
-                # Fallback to user_id filter (may not work with current Mem0 API)
-                filters = {"user_id": user_id}
-
-            if agent_id and not user_runs:
-                filters["agent_id"] = agent_id
-
-            # Combine with any additional metadata filters
-            if metadata_filters and not user_runs:
-                filters.update(metadata_filters)
-
-            # Search using Mem0 cloud platform with filters
+            # Use user_id filter with version="v2" for reliable cross-session recall.
             results = self.memory.search(
                 query=query,
-                filters=filters,
+                filters={"user_id": user_id},
+                version="v2",
                 limit=limit
             )
 
-            # DEBUG: Log raw results from Mem0
-            logger.debug(f"Raw Mem0 search results type: {type(results)}")
-            logger.debug(f"Raw Mem0 search results: {results}")
+            # Log raw results at INFO level for debugging
+            logger.info(f"Raw Mem0 search response type: {type(results)}")
 
             # Handle Mem0 returning dict with 'results' key
             if isinstance(results, dict):
                 results = results.get("results", [])
-                logger.debug(f"Extracted results list: {results}")
+
+            logger.info(f"Search returned {len(results)} results for user={user_id}, query='{query}'")
 
             if not results:
                 logger.info("No memories found for query")
@@ -339,17 +182,17 @@ class MemoryManager:
             # Normalize results to consistent format
             memories = []
             for i, mem in enumerate(results):
-                logger.debug(f"Processing result {i}: type={type(mem)}, value={mem}")
                 if isinstance(mem, dict):
-                    memories.append({
+                    memory_entry = {
                         "id": mem.get("id", "unknown"),
                         "memory": mem.get("memory", str(mem)),
                         "score": mem.get("score", 1.0),
                         "created_at": mem.get("created_at", ""),
                         "metadata": mem.get("metadata", {})
-                    })
+                    }
+                    memories.append(memory_entry)
+                    logger.info(f"  Memory {i}: {memory_entry['memory'][:80]}")
                 else:
-                    # Handle string results from backend
                     memories.append({
                         "id": "unknown",
                         "memory": str(mem),
@@ -359,12 +202,11 @@ class MemoryManager:
                     })
 
             logger.info(f"Found {len(memories)} relevant memories")
-            logger.debug(f"Results:\n{json.dumps(memories, indent=2, default=str)}")
 
             return memories
 
         except Exception as e:
-            logger.error(f"Error searching memories: {e}")
+            logger.error(f"Error searching memories: {e}", exc_info=True)
             return []
 
 
@@ -373,10 +215,7 @@ class MemoryManager:
         user_id: str,
         format: str = "json"
     ) -> Dict[str, Any]:
-        """Export all memories to JSON or other format asynchronously.
-
-        Retrieves all stored memories for the user and formats them for export.
-        Useful for backup, analysis, or migration to other systems. Must be awaited.
+        """Export all memories to JSON format asynchronously.
 
         Args:
             user_id: User identifier (required for multi-tenant isolation)
@@ -384,9 +223,6 @@ class MemoryManager:
 
         Returns:
             Dictionary containing all memories and metadata
-
-        Raises:
-            ValueError: If user_id is empty or format is not supported
         """
         if not user_id or not user_id.strip():
             raise ValueError("user_id cannot be empty")
@@ -397,8 +233,10 @@ class MemoryManager:
         try:
             logger.info(f"Exporting memories for user={user_id} in {format} format")
 
-            # Get all memories from Mem0 cloud platform
-            all_memories = self.memory.get_all(filters={"user_id": user_id})
+            all_memories = self.memory.get_all(
+                filters={"user_id": user_id},
+                version="v2"
+            )
 
             export_data = {
                 "user_id": user_id,
@@ -409,7 +247,6 @@ class MemoryManager:
             }
 
             logger.info(f"Exported {len(all_memories)} memories for user={user_id}")
-            logger.debug(f"Export data:\n{json.dumps(export_data, indent=2, default=str)}")
 
             return export_data
 
@@ -429,19 +266,12 @@ class MemoryManager:
     ) -> List[Dict[str, Any]]:
         """Get all memories for a specific user asynchronously.
 
-        Retrieves all stored memories for the given user, optionally limited to a
-        specific count. Multi-tenant: user_id isolates memories to specific user.
-        Returns memories in reverse chronological order (newest first). Must be awaited.
-
         Args:
             user_id: User identifier (required for multi-tenant isolation)
             limit: Optional maximum number of memories to return
 
         Returns:
             List of all memory dictionaries for the user
-
-        Raises:
-            ValueError: If user_id is empty
         """
         if not user_id or not user_id.strip():
             raise ValueError("user_id cannot be empty")
@@ -449,43 +279,20 @@ class MemoryManager:
         try:
             logger.info(f"Retrieving all memories for user={user_id}")
 
-            # Get all run_ids for this user for cross-session recall
-            try:
-                users_data = self.memory.users()
-                user_runs = [u['name'] for u in users_data.get('results', [])
-                           if u.get('type') == 'run' and u['name'].startswith(user_id + '-')]
-                logger.debug(f"Found {len(user_runs)} runs for user={user_id}: {user_runs}")
-            except Exception as e:
-                logger.warning(f"Could not get user runs: {e}")
-                user_runs = []
+            result = self.memory.get_all(
+                filters={"user_id": user_id},
+                version="v2"
+            )
 
-            # Aggregate memories from all runs for this user
-            all_memories = []
-            if user_runs:
-                for run_id in user_runs:
-                    try:
-                        result = self.memory.get_all(filters={"run_id": run_id})
-                        if isinstance(result, dict):
-                            memories = result.get("results", result.get("memories", []))
-                        else:
-                            memories = result if isinstance(result, list) else []
-                        all_memories.extend(memories)
-                    except Exception as e:
-                        logger.warning(f"Error getting memories for run {run_id}: {e}")
+            if isinstance(result, dict):
+                all_memories = result.get("results", result.get("memories", []))
             else:
-                # Fallback: try user_id filter (may not work but worth trying)
-                result = self.memory.get_all(filters={"user_id": user_id})
-                if isinstance(result, dict):
-                    all_memories = result.get("results", result.get("memories", []))
-                else:
-                    all_memories = result if isinstance(result, list) else []
+                all_memories = result if isinstance(result, list) else []
 
             if limit and limit > 0:
                 all_memories = all_memories[:limit]
-                logger.info(f"Limited results to {limit} memories for user={user_id}")
 
             logger.info(f"Retrieved {len(all_memories)} total memories for user={user_id}")
-            logger.debug(f"Memories:\n{json.dumps(all_memories, indent=2, default=str)}")
 
             return all_memories
 
@@ -497,16 +304,10 @@ class MemoryManager:
     async def clear(self, user_id: str) -> None:
         """Clear all memories for a specific user asynchronously.
 
-        WARNING: This operation permanently deletes all stored memories for
-        the user. Multi-tenant: only affects specified user's memories.
-        Use with caution. Cannot be undone. Must be awaited.
+        WARNING: This permanently deletes all stored memories.
 
         Args:
             user_id: User identifier (required for multi-tenant isolation)
-
-        Raises:
-            ValueError: If user_id is empty
-            RuntimeError: If memory deletion fails
         """
         if not user_id or not user_id.strip():
             raise ValueError("user_id cannot be empty")
@@ -514,20 +315,23 @@ class MemoryManager:
         try:
             logger.warning(f"Clearing all memories for user: {user_id}")
 
-            # Get all memories from Mem0 cloud platform for specific user
-            all_memories = self.memory.get_all(filters={"user_id": user_id})
+            result = self.memory.get_all(
+                filters={"user_id": user_id},
+                version="v2"
+            )
+
+            if isinstance(result, dict):
+                all_memories = result.get("results", result.get("memories", []))
+            else:
+                all_memories = result if isinstance(result, list) else []
+
             memory_count = len(all_memories)
 
-            # Delete each memory individually using Mem0 cloud platform
             for mem in all_memories:
-                # Handle both dict and string formats
                 if isinstance(mem, dict):
                     memory_id = mem.get("id")
                     if memory_id:
                         self.memory.delete(memory_id=memory_id)
-                elif isinstance(mem, str):
-                    # If mem is a string, it might be the memory ID itself
-                    logger.debug(f"Skipping string memory entry: {mem[:50]}...")
 
             logger.info(f"Cleared {memory_count} memories successfully")
 
@@ -545,11 +349,7 @@ class MemoryManager:
         run_id: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None
     ) -> None:
-        """Add a conversation turn to memory asynchronously for a specific user/session.
-
-        Stores a complete conversation exchange (user message + assistant response)
-        as an episodic memory. Multi-tenant: user_id isolates conversation history.
-        This method is typically called automatically by the agent after each interaction.
+        """Add a conversation turn to memory asynchronously.
 
         Args:
             user_id: User identifier (required for multi-tenant isolation)
@@ -560,34 +360,22 @@ class MemoryManager:
             metadata: Optional metadata for the conversation turn
         """
         try:
-            # Format conversation as string for Mem0 cloud platform
-            # (Mem0 cloud works better with string format than message list)
             conversation_text = f"User: {user_message}\nAssistant: {assistant_message}"
-
-            # Enhance metadata with session context
-            full_metadata = metadata or {}
-            full_metadata.update({
-                "conversation_turn": True,
-                "type": "episodic"
-            })
-            if agent_id:
-                full_metadata["agent_id"] = agent_id
-            if run_id:
-                full_metadata["run_id"] = run_id
 
             logger.debug(
                 f"Adding conversation for user={user_id}, agent={agent_id}, session={run_id} "
                 f"(user msg length: {len(user_message)})"
             )
 
+            # Store in Mem0 cloud platform - only pass user_id.
+            # Don't pass metadata or run_id as they can cause silent failures
+            # in Mem0's background processing, making memories un-searchable.
             self.memory.add(
                 conversation_text,
                 user_id=user_id,
-                run_id=run_id,
-                metadata=full_metadata
             )
 
-            logger.debug(f"Conversation stored for user={user_id} with context (agent={agent_id}, session={run_id})")
+            logger.debug(f"Conversation stored for user={user_id}")
 
         except Exception as e:
             logger.error(f"Error storing conversation: {e}")
@@ -597,23 +385,25 @@ class MemoryManager:
     async def get_stats(self, user_id: str) -> Dict[str, Any]:
         """Get memory statistics for a specific user asynchronously.
 
-        Multi-tenant: returns stats only for specified user's memories.
-        Must be awaited.
-
         Args:
             user_id: User identifier (required for multi-tenant isolation)
 
         Returns:
             Dictionary containing memory count and other statistics
-
-        Raises:
-            ValueError: If user_id is empty
         """
         if not user_id or not user_id.strip():
             raise ValueError("user_id cannot be empty")
 
         try:
-            all_memories = self.memory.get_all(filters={"user_id": user_id})
+            result = self.memory.get_all(
+                filters={"user_id": user_id},
+                version="v2"
+            )
+
+            if isinstance(result, dict):
+                all_memories = result.get("results", result.get("memories", []))
+            else:
+                all_memories = result if isinstance(result, list) else []
 
             stats = {
                 "user_id": user_id,
